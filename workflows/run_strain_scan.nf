@@ -4,7 +4,9 @@ General workflow, assembly SRA-NCBI-id_samples included in text list
 
 //import modules
 include {strain_scan} from  "../modules/strain_scan"
+include {merge_results} from "../modules/strain_scan"
 include {fastp} from "../modules/clean_reads"
+
 
 workflow STRAIN_SCAN {
       Channel
@@ -25,6 +27,9 @@ workflow STRAIN_SCAN {
   // Define the database directory
     dbfolder = Channel.value(file("${params.database_dir}")) 
     strain_scan(clean_reads, dbfolder)
-    strain_profile=strain_scan.out.strain_profile
+    strain_profile=strain_scan.out.strain_profile.collect()
+    //merge_results(strain_profile)
+    merge_results(strain_profile)
+
 }
 

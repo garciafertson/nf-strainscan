@@ -1,12 +1,12 @@
 
-process metaphlan_align{
+process strain_scan{
   //set directives to control
   //scratch true
   cpus '1'
   time '8h'
   maxForks 40
   container "sysbiojfgg/strainscan:v1.0.14" 
-  publishDir "strainscan_out", mode: "copy"
+  //publishDir "strainscan_out", mode: "copy"
   errorStrategy { sleep(Math.pow(2, task.attempt) * 60 as long); return 'retry' }
   maxRetries 3
   
@@ -14,14 +14,15 @@ process metaphlan_align{
     tuple val(x), path(fastq)
     path(database_dir)
   output:
-    path ("${x.id}") , emit: strain_profile
+    tuple val(x), path ("${x.id}.txt") , emit: strain_profile
   script:
 
   if(params.single_end){
   """
   strainscan -i ${fastq[0]} \\
           -d ${database_dir} \\
-          -o ${x.id} \\
+          -o strain_${x.id} \\
+  mv strain_${x.id}/final_report.txt ${x.id}.txt
   """
 
   }else{
@@ -30,6 +31,7 @@ process metaphlan_align{
             -j ${fastq[1]} \\
            -d ${database_dir} \\
            -o "strain_${x.id}" \\
+  mv strain_${x.id}/final_report.txt ${x.id}.txt  
   """
   }
 }
@@ -37,19 +39,20 @@ process metaphlan_align{
 
 ////////////
 // Extract db markers
-process build_db{
+process merge_results{
    //set directives
   cpus '1'
   time '4h'
-  container "biobakery/metaphlan:4.0.2" 
+  container "sysbiojfgg/strainscan:v1.0.14" 
+  publishDir "strainscan_out", mode: "copy"
 
   input:
-  val(x) //sgb
+  path(strain_profile)
   output:
-  tuple val(x), path("*.fna"), emit: sgb_markers
+  path("strainscan_merged.tsv"), emit: merged
+
   script:
     """
-    extract_markers.py -c ${x} -o . \\
-    --bowtie2db ${params.bowtie2db} 
+    merge_results.py -i ${strain_profile} -o strainscan_merged.tsv \\
     """
 }
