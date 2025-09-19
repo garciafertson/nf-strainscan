@@ -21,7 +21,7 @@ process strain_scan{
   """
   strainscan -i ${fastq[0]} \\
           -d ${database_dir} \\
-          -o strain_${x.id} \\
+          -o strain_${x.id} 
   mv strain_${x.id}/final_report.txt ${x.id}.txt
   """
 
@@ -30,7 +30,7 @@ process strain_scan{
   strainscan -i ${fastq[0]} \\
             -j ${fastq[1]} \\
            -d ${database_dir} \\
-           -o "strain_${x.id}" \\
+           -o "strain_${x.id}" 
   mv strain_${x.id}/final_report.txt ${x.id}.txt  
   """
   }
