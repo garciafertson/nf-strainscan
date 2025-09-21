@@ -61,6 +61,6 @@ process merge_results{
 
   script:
     """
-    merge_results.py -i ${strain_profile} -o strainscan_merged.tsv \\
+    merge_results.py -i *.txt -o strainscan_merged.tsv \\
     """
 }
