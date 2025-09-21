@@ -55,7 +55,7 @@ process merge_results{
   publishDir "strainscan_out", mode: "copy"
 
   input:
-  path(strain_profile)
+  tuple val(x), path(strain_profile)
   output:
   path("strainscan_merged.tsv"), emit: merged
 
