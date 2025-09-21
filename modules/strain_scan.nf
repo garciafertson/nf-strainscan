@@ -14,7 +14,7 @@ process strain_scan{
     tuple val(x), path(fastq)
     path(database_dir)
   output:
-    tuple val(x), path ("${x.id}.txt") , emit: strain_profile, optional true
+    tuple val(x), path ("${x.id}.txt") , emit: strain_profile, optional: true
   script:
 
   if(params.single_end){
