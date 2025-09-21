@@ -14,7 +14,7 @@ process strain_scan{
     tuple val(x), path(fastq)
     path(database_dir)
   output:
-    tuple val(x), path ("${x.id}.txt") , emit: strain_profile
+    tuple val(x), path ("${x.id}.txt") , emit: strain_profile, optional true
   script:
 
   if(params.single_end){
@@ -22,7 +22,11 @@ process strain_scan{
   strainscan -i ${fastq[0]} \\
           -d ${database_dir} \\
           -o strain_${x.id} 
-  mv strain_${x.id}/final_report.txt ${x.id}.txt
+  #then move the final report to current dir with sample id name
+  #first check if the the final report exists
+  if [ -f strain_${x.id}/final_report.txt ]; then
+      mv strain_${x.id}/final_report.txt ${x.id}.txt
+  fi
   """
 
   }else{
@@ -31,7 +35,11 @@ process strain_scan{
             -j ${fastq[1]} \\
            -d ${database_dir} \\
            -o "strain_${x.id}" 
-  mv strain_${x.id}/final_report.txt ${x.id}.txt  
+  #then move the final report to current dir with sample id name
+  #first check if the the final report exists
+  if [ -f strain_${x.id}/final_report.txt ]; then
+      mv strain_${x.id}/final_report.txt ${x.id}.txt
+  fi
   """
   }
 }
